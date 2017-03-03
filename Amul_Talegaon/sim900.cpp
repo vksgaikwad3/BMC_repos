@@ -8,8 +8,8 @@
 char aux_str[100];
     
 char pin[]="";
-//char apn[]= "www";  //"imis/internet";     //idea Vodaphone APN = "www"
-char apn[]="airtelgprs.com";     //Airtel
+char apn[]= "www";  //"imis/internet";     //idea Vodaphone APN = "www"
+//char apn[]="airtelgprs.com";     //Airtel
 
 
 char user_name[]="";
