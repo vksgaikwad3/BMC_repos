@@ -8,8 +8,8 @@
 char aux_str[100];
     
 char pin[]="";
-char apn[]= "www";  //"imis/internet";     //idea Vodaphone APN = "www"
-//char apn[]="airtelgprs.com";     //Airtel
+//char apn[]= "www";  //"imis/internet";     //idea Vodaphone APN = "www"
+char apn[]="airtelgprs.com";     //Airtel
 
 
 char user_name[]="";
@@ -64,10 +64,10 @@ void sim900_GPRS::power_on()
     // Once GSM get ON dothe folowing configurations to Send Systems Setting over SMS
       
     //sendATcommand("ATE0", "OK", 1000);        // ON/OFF AT command info
-   // sendATcommand("AT+CMGF=1", "OK",1000);    // Select SMS message Format 0 = PDU mode , 1 = Text Mode
-   // sendATcommand("AT+CMGD=1", "OK", 1000);   // Delete an SMS message
-   // sendATcommand("AT+CNMI=2,2,0,0,0\r", "OK", 1000);  //New SMS Indications 
-   // sendATcommand("AT+CMGR=1", "OK", 1000);            // Read SMS message has just arrived
+    sendATcommand("AT+CMGF=1", "OK",1000);    // Select SMS message Format 0 = PDU mode , 1 = Text Mode
+    sendATcommand("AT+CMGD=1", "OK", 1000);   // Delete an SMS message
+    sendATcommand("AT+CNMI=2,2,0,0,0\r", "OK", 1000);  //New SMS Indications 
+    sendATcommand("AT+CMGR=1", "OK", 1000);            // Read SMS message has just arrived
     
     
    // sendATcommand("AT+CCLK?", "OK", 1000);          // GSM Clock optional
@@ -108,6 +108,19 @@ int8_t sim900_GPRS::sendATcommand(char* ATcommand, char* expected_answer, unsign
             {
                 answer = 1;
             }
+             else if(strstr(response, "#RESET") != NULL || strstr(response, "RING") != NULL)    
+            {
+                Serial.println("#RESET Found in a SMS");
+              
+               // void software_Reset() // Restarts program from beginning but does not reset the peripherals and registers
+               // {
+               // asm volatile ("  jmp 0");
+               // Serial.println("RESET DONE");  
+                sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000);
+             // asm volatile ("  jmp 0");  
+              wdt_enable(WDTO_15MS); // turn on the WatchDog and don't stroke it.
+
+             }
         }
     }
     // Waits for the asnwer with time out
@@ -153,6 +166,19 @@ Serial.println(ATcommand);
             {
                 answer = 2;
             }
+             else if(strstr(response, "#RESET") != NULL || strstr(response, "RING") != NULL)    
+            {
+                Serial.println("#RESET Found in a SMS");
+              
+               // void software_Reset() // Restarts program from beginning but does not reset the peripherals and registers
+               // {
+               // asm volatile ("  jmp 0");
+               // Serial.println("RESET DONE");  
+                sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000);
+             // asm volatile ("  jmp 0");  
+              wdt_enable(WDTO_15MS); // turn on the WatchDog and don't stroke it.
+
+             }
           
          
         }
@@ -204,6 +230,19 @@ int8_t sim900_GPRS::sendATcommand3(String ATcommand, char* expected_answer1,char
             {
                 answer = 3;
             }
+             else if(strstr(response, "#RESET") != NULL || strstr(response, "RING") != NULL)    
+            {
+                Serial.println("#RESET Found in a SMS");
+              
+               // void software_Reset() // Restarts program from beginning but does not reset the peripherals and registers
+               // {
+               // asm volatile ("  jmp 0");
+               // Serial.println("RESET DONE");  
+                sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000);
+             // asm volatile ("  jmp 0");  
+              wdt_enable(WDTO_15MS); // turn on the WatchDog and don't stroke it.
+
+             }
           
          
         }
@@ -230,6 +269,18 @@ void sim900_GPRS::updateThinkSpeak(String channel_apiKey,uint8_t id1,uint8_t id2
         //sendATcommand2(aux_str, "CONNECT OK", "CONNECT FAIL", 30000);
           snprintf(aux_str, sizeof(aux_str), "AT+CSTT=\"%s\",\"%s\",\"%s\"", apn, user_name, password);  //Put GPRS setings
         // Sets the APN, user name and password
+
+        //check wether GPRS is attached or detached
+        
+        if(!sendATcommand("AT+CGATT?","+CGATT: 0\n OK",2000))       // GPRS is detached 
+        { // attached the GPRS
+           Serial.println("GPRS connections is attached "); 
+          while(sendATcommand("AT+CGATT=1","OK",3000) !=1);        //donothing until GPRS gets setup
+          Serial.println("GPRS connections is UP Now ");      
+        }
+        else { Serial.println("GPRS is already attached ");
+        }
+        
         if (sendATcommand2(aux_str, "OK",  "ERROR", 30000) == 1)
         {            
           // Waits for status IP START
@@ -294,23 +345,25 @@ void sim900_GPRS::updateThinkSpeak(String channel_apiKey,uint8_t id1,uint8_t id2
                 GPRSFailedSMS();        // SMS GPRS connecion Problem
                 wdt_enable(WDTO_8S);    // Enable Watchdog Reset 
           }
-        }         //AT+CSTT APN,PSW,PORT setting
-       }          // else of AT+CIPMUX =0  Single-connection mode
-   }              //if(sim900Status==true)
+        }else {         //AT+CSTT APN,PSW,PORT setting
+              int cnt = 0;
+              Serial.println("Failed to set APN,PSW,PORT parameters, AT+CSTT...");
+              sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000);
+              if(cnt > 0)
+              {
+                Serial.println("Error coming frequently, RESET the Device ");
+                wdt_enable(WDTO_8S);    // Enable Watchdog Reset 
+              }          
+          }         
+      }        // else of AT+CIPMUX =0  Single-connection mode  
+   } //if(sim900Status==true)
  
-    Serial.println("Shutting down the connection.........");
-   if(sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000) != 1)   // Error Comes
-   {
-     Serial.println("CIPSHUT Failed, Closing down Connection Failed");
-     wdt_enable(WDTO_8S);    // Enable Watchdog Reset
-    
-   }
-   else
-   {
-     Serial.println("Sucessfully Closed the Connections ");
-    
-   }
-    delay(5000);
+  Serial.println("Shutting down the connection.........");
+  sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000);
+  delay(5000);
+  sendATcommand("AT+CGATT=1","OK",3000);
+
+  //delay(5000);
     //wdt_enable(WDTO_8S);    // Enable Watchdog Reset
 }
 
