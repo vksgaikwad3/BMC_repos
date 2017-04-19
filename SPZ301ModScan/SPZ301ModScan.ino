@@ -118,7 +118,7 @@ void setup()
   // modbus_construct(&packets[PACKET1], 1, READ_HOLDING_REGISTERS, 4, 17, 0);  // Control Panel Resisters [40005 - 40021]
    //modbus_construct(&packets[PACKET1], 1, READ_HOLDING_REGISTERS, 21,11,0 );  // Control Panel Resisters [400022 - 40032] Faults 
    // ENERGY METER PACKET
-      modbus_construct(&packets[PACKET1], 2,READ_HOLDING_REGISTERS,3000,4,0); //Reading from 3000 - 3004 reg[0-3]
+      modbus_construct(&packets[PACKET1], 1,READ_HOLDING_REGISTERS,3000,4,0); //Reading from 3000 - 3004 reg[0-3]
      
       modbus_construct(&packets[PACKET2], 2,READ_HOLDING_REGISTERS,3004,6, 4); //Reading from 3004 - 3009   reg[4-9]
       modbus_construct(&packets[PACKET3], 2,READ_HOLDING_REGISTERS,3010,2,10);  //  3010 - 3011    reg[10-11]  Avg Power Factor
