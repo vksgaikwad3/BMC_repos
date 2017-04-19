@@ -45,7 +45,7 @@ RTC_DS3231 rtc;           // RTC instance
 
 
 #define baud 9600
-#define timeout 1000
+#define timeout 5000
 #define polling 200
 #define retry_count 20
 
@@ -127,7 +127,7 @@ void setup()
   myGateway.power_on();           // POWER ON GSM Module for communication 
   
 /************** SD Card Init/Startup Code ***********************/
- isSDCardCheck("chiller.csv");     //provide a File Name to Store log of ModBus Devices
+ //isSDCardCheck("chiller.csv");     //provide a File Name to Store log of ModBus Devices
  pinMode(A14,OUTPUT);
  digitalWrite(A14,LOW);
  myGateway.SendMessage();   //Send SMS on Device ON
@@ -218,10 +218,10 @@ void loop()
  // Serial.println("***********************************************************************");
  // ************ Sending Data to SD card ***********************
 //
- writetoSDCard ("chiller.csv",FILE_WRITE ,getlogTime(), packets[PACKET1].id, battery_Temp, milk_Temp, auxillary_Temp, battery_Volt, ac_Volt, compressor_Current, pump_Current,
-                 charg_pump_Relay, condensor_Relay, compressor_Relay, inverter_Relay, agitator_Relay,tank_Relay, shiva_Relay, discharge_pump_Relay,compressor_run_Hour,
-                 packets[PACKET2].id,em2_lineVolts, em2_lineCurrent,em2_powerFactor,em2_power, em2_deviceRunHr,em2_powerAvailableTime,em2_VA_Avg);
-
+// writetoSDCard ("chiller.csv",FILE_WRITE ,getlogTime(), packets[PACKET1].id, battery_Temp, milk_Temp, auxillary_Temp, battery_Volt, ac_Volt, compressor_Current, pump_Current,
+//                 charg_pump_Relay, condensor_Relay, compressor_Relay, inverter_Relay, agitator_Relay,tank_Relay, shiva_Relay, discharge_pump_Relay,compressor_run_Hour,
+//                 packets[PACKET2].id,em2_lineVolts, em2_lineCurrent,em2_powerFactor,em2_power, em2_deviceRunHr,em2_powerAvailableTime,em2_VA_Avg);
+//
 
 /*   Sending Data to Cloud *************/
 //Milk Chiller Channel
@@ -233,13 +233,13 @@ delay(3000);
 // Milk Chiller Relay Channel
 
 //myGateway.sendATcommand("AT+CSQ", "OK", 1000);
-myGateway.updateThinkSpeak(channel_apiKey[1],1,2,3,4,charg_pump_Relay,condensor_Relay,compressor_Relay,inverter_Relay,agitator_Relay,tank_Relay,shiva_Relay,discharge_pump_Relay);    //update Milk Chiller Relays Channel field 1 -4
-delay(2000);
+//myGateway.updateThinkSpeak(channel_apiKey[1],1,2,3,4,charg_pump_Relay,condensor_Relay,compressor_Relay,inverter_Relay,agitator_Relay,tank_Relay,shiva_Relay,discharge_pump_Relay);    //update Milk Chiller Relays Channel field 1 -4
+//delay(2000);
 
 // Geyser Energy Meter Upload
 
-myGateway.updateThinkSpeak(channel_apiKey[2],1,2,3,4,em2_lineVolts,em2_lineCurrent,em2_powerFactor,em2_power,0,em2_deviceRunHr,em2_powerAvailableTime,em2_VA_Avg);                  //update Energy meter 1 - 4 fields
-delay(2000);
+//myGateway.updateThinkSpeak(channel_apiKey[2],1,2,3,4,em2_lineVolts,em2_lineCurrent,em2_powerFactor,em2_power,0,em2_deviceRunHr,em2_powerAvailableTime,em2_VA_Avg);                  //update Energy meter 1 - 4 fields
+//delay(2000);
 
 
 
