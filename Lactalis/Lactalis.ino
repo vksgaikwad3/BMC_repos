@@ -16,7 +16,7 @@
    Slave ID : 2, Baud Rate: 9600, Parity :None, Stop bit : 1
  * 
  * MODBUS Electrical Connections: 
- * 1> MILK Chiller Serial(RS 232) --> 485 Converter Pin 1 --> A of MAX485 Chip Adapter.
+ * 1> MILK Chiller Ser  ial(RS 232) --> 485 Converter Pin 1 --> A of MAX485 Chip Adapter.
  *                                    485 Converter Pin 2 --> B of MAX485 Chip Adapter.        
  * 2> Energy Meter (RS485 Signal) --> A (Green Wire) -->  B of MAX485 Chip Adapter. 
  *                                    B (Yellow Wire) --> A of MAX485 Chip Adapter.
@@ -47,7 +47,7 @@ RTC_DS3231 rtc;           // RTC instance
 #define baud 9600
 #define timeout 1000
 #define polling 200
-#define retry_count 20
+#define retry_count 40
 
 #define TxEnablePin 2 
 
@@ -55,7 +55,7 @@ RTC_DS3231 rtc;           // RTC instance
 const uint8_t ChipSelect = 53 ;   //SD Card ChipSelect pin. Dont Change
 
 
-#define TOTAL_NO_OF_REGISTERS 74        // prev.cnt = 33 Control Panel Resisters = 17 , Energy Meter Resisters = 16
+#define TOTAL_NO_OF_REGISTERS 75        // prev.cnt = 33 Control Panel Resisters = 17 , Energy Meter Resisters = 16
 
 enum
 {
@@ -159,8 +159,8 @@ void setup()
     modbus_construct(&packets[PACKET18], 2,READ_INPUT_REGISTERS , 34, 2, 49);    // 30035-36 PF1 reg[49-50]    PF3
     modbus_construct(&packets[PACKET19], 2,READ_INPUT_REGISTERS , 62, 2, 51);    // 30063-64 PF1 reg[51-52]    PF Avg
     
-    modbus_construct(&packets[PACKET20], 2,READ_INPUT_REGISTERS , 72,2, 53);    // 30073-74 Power Consumption  reg[53-54]   Reading 16384(73)[IMP] History Value
- 
+    modbus_construct(&packets[PACKET20], 2,READ_INPUT_REGISTERS , 72,2, 53);    // 30073-74 Power Consumption  reg[53-54]   Reading 16384(73)[IMP] History Value 
+                                                                                // (make 74 for Ram Nagar)        
     modbus_construct(&packets[PACKET21], 2,READ_INPUT_REGISTERS , 84,2, 55);    // 30089-90 Sys Power(W) reg[55-56]  // 84 Live Value of Watts
     modbus_construct(&packets[PACKET22], 2,READ_INPUT_REGISTERS , 226,2,57);    // 30227-28 Device Run Hr reg[57-58]     
     modbus_construct(&packets[PACKET23], 2,READ_INPUT_REGISTERS , 228,2,59);    // 30227-28 Power Available Time reg[59-60]    
@@ -201,10 +201,10 @@ void loop()
 {     
   DateTime now = rtc.now();
    //DateTime now = rtc.now();
-  for(int i=0;i<600;i++)
+  for(int i=0;i<700;i++)
   {
     modbus_update();
-    delay(10); //Serial.println(i);
+    delay(40); //Serial.println(i);
   }
 //  if(now.second() == 30)
 //  { 
@@ -231,7 +231,7 @@ void loop()
   boolean shiva_Relay = regs[13];
   boolean discharge_pump_Relay = regs[14];
   uint32_t compressor_run_Hour = regs[16];
-/*    
+   
   Serial.print("Battery Temp.: ");Serial.println(battery_Temp,DEC);
   Serial.print("Milk Temp.: ");Serial.println(milk_Temp,DEC);
   Serial.print("Auxillary Temp.: ");Serial.println(auxillary_Temp,DEC);
@@ -250,7 +250,7 @@ void loop()
   Serial.print("Discharge Pump Relay.: ");Serial.println(discharge_pump_Relay,DEC);
   Serial.print("Compressor Run Hr.: ");Serial.println(compressor_run_Hour,DEC);
   delay(20);
-*/ 
+ 
     // Energy Meter Readings 
  // Serial.println("************ Energy Meter Readings ************* ");
  
@@ -286,7 +286,7 @@ void loop()
   float em2_powerAvailableTime = myGateway.hextofloat(regs[59],regs[60]);
  
   //float energy_meter[] = { lineVolts,lineCurrent,deviceVolts,deviceCurrent,power,powerConsump,deviceRunHr,powerAvailable };
-/*
+
   Serial.print("EM2_line1 Volts:");Serial.println(em2_line1_Volts);
   Serial.print("EM2_line2 Volts:");Serial.println(em2_line2_Volts);
   Serial.print("EM2_line3 Volts:");Serial.println(em2_line3_Volts);
@@ -315,7 +315,7 @@ void loop()
 
   Serial.print("EM2_ kWh Reading:");Serial.println(kWh_Reading);           //History
   Serial.print("EM2_powerAvailableTime:");Serial.println(em2_powerAvailableTime);
-*/
+
 // Energy Meter 3 Geyser 
  // Serial.println("***********************************************************************");
   
@@ -329,7 +329,7 @@ void loop()
   float em3_powerAvailableTime = myGateway.hextofloat(regs[73],regs[74]);
 
   float em3_VA_Avg = myGateway.hextofloat(regs[75],regs[76]);
-/*
+
   Serial.print("EM3_line Volts:");Serial.println(em3_lineVolts);
   Serial.print("EM3_line Current:");Serial.println(em3_lineCurrent);
   Serial.print("EM3_powerFactor:");Serial.println(em3_powerFactor);
@@ -340,7 +340,7 @@ void loop()
   Serial.print("EM3_Device Run Hr:");Serial.println(em3_deviceRunHr);
   Serial.print("EM3_powerAvailableTime:");Serial.println(em3_powerAvailableTime);
   Serial.print("EM3_KVAh Reading:");Serial.println(em3_VA_Avg);
-*/
+
 // Energy Meter 4 
  // Serial.println("***********************************************************************");
  // ************ Sending Data to SD card ***********************
@@ -354,13 +354,13 @@ void loop()
 
 /*   Sending Data to Cloud *************/
 //Milk Chiller Channel
-
+//
 myGateway.updateThinkSpeak(channel_apiKey[0],1,2,3,4,battery_Temp,milk_Temp,auxillary_Temp,battery_Volt,ac_Volt,compressor_Current,pump_Current,compressor_run_Hour);    //update Milk Chiller Channel 1 - 4 fields
-delay(3000);
+delay(2000);
 
 // Milk Chiller Relay Channel
 
-//myGateway.sendATcommand("AT+CSQ", "OK", 1000);
+myGateway.sendATcommand("AT+CSQ", "OK", 1000);
 myGateway.updateThinkSpeak(channel_apiKey[1],1,2,3,4,charg_pump_Relay,condensor_Relay,compressor_Relay,inverter_Relay,agitator_Relay,tank_Relay,shiva_Relay,discharge_pump_Relay);    //update Milk Chiller Relays Channel field 1 -4
 delay(2000);
 
@@ -375,7 +375,7 @@ delay(2000);
 
 myGateway.updateThinkSpeak(channel_apiKey[3],1,2,3,4,em2_line1_Volts,em2_line2_Volts,em2_line3_Volts, em2_line1_Current,em2_line2_Current,em2_line3_Current,kWh_Reading,em2_powerAvailableTime);
 delay(2000);
-
+//
 // 3 Ph meter Parameter ID 2
 myGateway.updateThinkSpeak(channel_apiKey[4],1,2,3,4,em2_W1_Watt,em2_W2_Watt,em2_W3_Watt,em2_VA1,em2_VA2,em2_VA3,KVAh_Reading,0); // Field 8 = NC
 delay(2000);
@@ -407,10 +407,12 @@ String getlogTime()
    logTime += now.minute();// + 13 ;
    logTime += ":";
    logTime += now.second();
+
    
    //Serial.print("Time:");Serial.println(logTime);
    //delay(2000);
    return logTime;
+  // return (myGateway.sendATcommand("AT+CCLK=?", "OK", 1000));
 }
 
 
