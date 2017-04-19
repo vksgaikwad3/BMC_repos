@@ -8,8 +8,8 @@
 char aux_str[100];
     
 char pin[]="";
-//char apn[]="imis/internet";     //idea Vodaphone APN = "www"
-char apn[]="airtelgprs.com";     //Airtel
+char apn[]= "www" ;   //"imis/internet";     //idea Vodaphone APN = "www"
+//char apn[]="airtelgprs.com";     //Airtel
 
 
 char user_name[]="";
@@ -70,8 +70,8 @@ void sim900_GPRS::power_on()
      sendATcommand("AT+CMGR=1", "OK", 1000);            // Read SMS message has just arrived
     
     
-   // sendATcommand("AT+CCLK?", "OK", 1000);          // GSM Clock optional
-  //   sendATcommand("AT+CCLK=\"16/07/27,14:32:30+05\"", "OK", 1000);
+     sendATcommand("AT+CCLK?", "OK", 1000);          // GSM Clock optional
+    // sendATcommand("AT+CCLK=\"17/03/05,18:50:30+05\"", "OK", 1000);
   //  sendSMS("hello");
 }
 
@@ -264,7 +264,7 @@ void sim900_GPRS::updateThinkSpeak(String channel_apiKey,uint8_t id1,uint8_t id2
        {
         // Waits for status IP INITIAL
           while(sendATcommand("AT+CIPSTATUS","INITIAL", 1000)  == 0 );  // Check Current Connection Status
-          delay(5000);                                                   //wait 5 sec
+          delay(2000);                                                   //wait 5 sec
         //aux_str="AT+CSTT=\"airtelgprs.com\",\"\",\"\"";
         //sendATcommand2(aux_str, "CONNECT OK", "CONNECT FAIL", 30000);
           snprintf(aux_str, sizeof(aux_str), "AT+CSTT=\"%s\",\"%s\",\"%s\"", apn, user_name, password);  //Put GPRS setings
@@ -358,7 +358,7 @@ void sim900_GPRS::updateThinkSpeak(String channel_apiKey,uint8_t id1,uint8_t id2
    }              //if(sim900Status==true)
     Serial.println("Shutting down the connection.........");
     sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000);
-    delay(5000);
+    delay(2000);
     sendATcommand("AT+CGATT=1","OK",3000);
     //wdt_enable(WDTO_8S);    // Enable Watchdog Reset
 }
@@ -542,7 +542,7 @@ void sim900_GPRS::SendMessage()
   delay(1000);  // Delay of 1000 milli seconds or 1 second
   Serial1.println("AT+CMGS=\"+918983537961\"\r"); // Replace x with mobile number
   delay(1000);
-  Serial1.println("Device is Power ON in SOGATHUR, Chennai,Tamil Nadu Lactalis");// The SMS text you want to send
+  Serial1.println("Device is Power ON in Venkesapuram, Chennai,Tamil Nadu Lactalis");// The SMS text you want to send
   delay(100);
 //  Serial1.write(0x1A);
 //  Serial1.write(0x0D);
@@ -574,7 +574,7 @@ void sim900_GPRS::GPRSFailedSMS()
   delay(1000);  // Delay of 1000 milli seconds or 1 second
   Serial1.println("AT+CMGS=\"+918983537961\"\r"); // Replace x with mobile number
   delay(1000);
-  Serial1.println("GPRS Connection Failed, Retrying to connect, at SOGATHUR, Chennai Tamil Nadu, Lactalis");// The SMS text you want to send
+  Serial1.println("GPRS Connection Failed, Retrying to connect, at Venkesapuram, Chennai Tamil Nadu, Lactalis");// The SMS text you want to send
   delay(100);
 //  Serial1.write(0x1A);
 //  Serial1.write(0x0D);
