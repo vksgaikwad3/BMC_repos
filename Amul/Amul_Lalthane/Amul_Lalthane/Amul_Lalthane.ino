@@ -117,6 +117,7 @@ void setup()
 /************** SD Card Init/Startup Code ***********************/
  //isSDCardCheck("chiller.csv");     //provide a File Name to Store log of ModBus Devices
  pinMode(A14,OUTPUT);
+ //digitalWrite(2,LOW);
  digitalWrite(A14,LOW);
  myGateway.SendMessage();   //Send SMS on Device ON
  
