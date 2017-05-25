@@ -37,6 +37,7 @@
 
 
 String getlogTime();
+void(* resetFunc)(void)=0;      //RESET Function Routine 
 
 
 sim900_GPRS myGateway;    // Gateway object
@@ -69,6 +70,9 @@ Packet packets[TOTAL_NO_OF_PACKETS];
 int regs[TOTAL_NO_OF_REGISTERS];     // All the Data from Modbus Resisters gets stored here in this buffer.
 int cnt = 0;
 //char* apn;
+
+unsigned long previousMillis = 0 ;
+
 
 void setup()
 {
@@ -126,7 +130,18 @@ void setup()
 
 void loop()
 {     
-  DateTime now = rtc.now();
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= 60000) {      // 1 min
+    previousMillis = millis();
+    resetFunc();
+    Serial.println("***************************");
+    Serial.print("RESETED");
+//    Serial.print("\t ");
+//    Serial.println(millis() - previousMillis);
+//    Serial.println("***************************");
+//    resetFunc();
+  }
+  //DateTime now = rtc.now();
    //DateTime now = rtc.now();
   for(int i=0;i<600;i++)
   {
